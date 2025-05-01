@@ -5,7 +5,10 @@ from typing import Optional
 
 
 def create_promotion_codes(
-    coupon_id: str, num_coupons: int, prefix: Optional[str] = None
+    coupon_id: str,
+    num_coupons: int,
+    prefix: Optional[str] = None,
+    first_time_transaction: bool = True,
 ) -> None:
     """
     Create multiple Stripe promotion codes and save them to a file.
@@ -27,7 +30,7 @@ def create_promotion_codes(
                 coupon=coupon_id,
                 code=code,
                 max_redemptions=1,
-                restrictions={"first_time_transaction": True},
+                restrictions={"first_time_transaction": first_time_transaction},
                 active=True,
                 expires_at=int(time.time())
                 + (365 * 24 * 3600),  # Expiry defaults to 1 year
@@ -77,8 +80,13 @@ def main() -> None:
         or None
     )
 
+    response = input("Do you want to restrict the promotion code to first-time transactions? (Y/n): ").strip().upper()
+    first_time_transaction = response in ["Y", ""]  # Default to Yes if empty
+
     # Create the promotion codes
-    create_promotion_codes(coupon_id, num_coupons, prefix)
+    create_promotion_codes(
+        coupon_id, num_coupons, prefix, first_time_transaction=first_time_transaction
+    )
 
 
 if __name__ == "__main__":
